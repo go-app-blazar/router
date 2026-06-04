@@ -51,8 +51,6 @@ type CenterLayout struct {
 var _ router.RouterViewInterface = (*CenterLayout)(nil)
 
 func (c *CenterLayout) Render() app.UI {
-	slog.InfoContext(context.TODO(), "CenterLayout: Render")
-
 	return app.Div().
 		Class("center-layout").
 		Body(
