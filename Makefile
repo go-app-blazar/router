@@ -13,6 +13,10 @@ ALL_GO_FILES := $(shell find ./ -name '*.go')
 
 current_dir = $(shell pwd)
 
+.PHONY: build
+build:
+	go build ./...
+
 .PHONY: clean
 clean:
 	go clean
