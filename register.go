@@ -53,7 +53,9 @@ func Register(ctx context.Context, routes ...Route) error {
 		if err != nil {
 			return fmt.Errorf("could not parse route %q: %w", r.Path, err)
 		}
-		slog.InfoContext(ctx, "Registering route.", "path", r.Path)
+		if debugRegister {
+			slog.InfoContext(ctx, "Registering route.", "path", r.Path)
+		}
 		compiledRegexp, err := regexp.Compile(route.Regexp())
 		if err != nil {
 			return fmt.Errorf("could not compile route %q: %w", r.Path, err)
@@ -61,9 +63,13 @@ func Register(ctx context.Context, routes ...Route) error {
 		newRegisteredRoute := registeredRoute{
 			Regexp: compiledRegexp,
 			Component: func() app.Composer {
-				slog.InfoContext(ctx, "Register: func(): creating component for route.", "route", route)
+				if debugRegister {
+					slog.InfoContext(ctx, "Register: func(): creating component for route.", "route", route)
+				}
 				routeComponent := composeRoute(ctx, r.ComponentFunctions...)
-				slog.InfoContext(ctx, "Register: func()", "routeComponent", routeComponent, "type", fmt.Sprintf("%T", routeComponent))
+				if debugRegister {
+					slog.InfoContext(ctx, "Register: func()", "routeComponent", routeComponent, "type", fmt.Sprintf("%T", routeComponent))
+				}
 
 				wrapper := LayoutWrapper{
 					LayoutComponent:        routeComponent,
@@ -72,7 +78,9 @@ func Register(ctx context.Context, routes ...Route) error {
 					PathVariablesFunctions: r.PathVariablesFunctions,
 				}
 
-				slog.InfoContext(ctx, "Register: func()", "wrapper", fmt.Sprintf("%p", &wrapper), "LayoutComponent", fmt.Sprintf("%T", wrapper.LayoutComponent), "LayoutComponentPointer", fmt.Sprintf("%p", wrapper.LayoutComponent))
+				if debugRegister {
+					slog.InfoContext(ctx, "Register: func()", "wrapper", fmt.Sprintf("%p", &wrapper), "LayoutComponent", fmt.Sprintf("%T", wrapper.LayoutComponent), "LayoutComponentPointer", fmt.Sprintf("%p", wrapper.LayoutComponent))
+				}
 				return &wrapper
 			},
 			Meta: r.Meta,
@@ -101,10 +109,14 @@ func composeRoute(ctx context.Context, fs ...func() app.Composer) app.Composer {
 	var output app.Composer
 	for _, f := range goodFunctions {
 		component := f()
-		slog.DebugContext(ctx, "composeRoute: Created component", "type", fmt.Sprintf("%T", component))
+		if debugRegister {
+			slog.DebugContext(ctx, "composeRoute: Created component", "type", fmt.Sprintf("%T", component))
+		}
 		if component != nil {
 			if hasRouterView, ok := component.(RouterViewInterface); ok {
-				slog.InfoContext(ctx, "composeRoute: component is a RouterViewInterface.", "component", fmt.Sprintf("%T", component))
+				if debugRegister {
+					slog.InfoContext(ctx, "composeRoute: component is a RouterViewInterface.", "component", fmt.Sprintf("%T", component))
+				}
 				hasRouterView.SetRouterView(output)
 			}
 		}
@@ -140,9 +152,13 @@ func flattenRoutes(ctx context.Context, parentRoute internalRoute, routes ...Rou
 		for key, value := range route.Meta {
 			newRoute.Meta[key] = value
 		}
-		//slog.DebugContext(ctx, "flattenRoutes", "parentRoute", parentRoute)
-		//slog.DebugContext(ctx, "flattenRoutes", "parentRoute.Path", parentRoute.Path, "route.Path", route.Path)
-		//slog.DebugContext(ctx, "flattenRoutes", "newRoute", newRoute)
+		/*
+			if debugRegister {
+				slog.DebugContext(ctx, "flattenRoutes", "parentRoute", parentRoute)
+				slog.DebugContext(ctx, "flattenRoutes", "parentRoute.Path", parentRoute.Path, "route.Path", route.Path)
+				slog.DebugContext(ctx, "flattenRoutes", "newRoute", newRoute)
+			}
+		*/
 
 		if len(route.Children) == 0 {
 			output = append(output, newRoute)
