@@ -54,7 +54,7 @@ func Register(ctx context.Context, routes ...Route) error {
 			return fmt.Errorf("could not parse route %q: %w", r.Path, err)
 		}
 		if debugRegister {
-			slog.InfoContext(ctx, "Registering route.", "path", r.Path)
+			slog.DebugContext(ctx, "Registering route.", "path", r.Path)
 		}
 		compiledRegexp, err := regexp.Compile(route.Regexp())
 		if err != nil {
@@ -64,11 +64,11 @@ func Register(ctx context.Context, routes ...Route) error {
 			Regexp: compiledRegexp,
 			Component: func() app.Composer {
 				if debugRegister {
-					slog.InfoContext(ctx, "Register: func(): creating component for route.", "route", route)
+					slog.DebugContext(ctx, "Register: func(): creating component for route.", "route", route)
 				}
 				routeComponent := composeRoute(ctx, r.ComponentFunctions...)
 				if debugRegister {
-					slog.InfoContext(ctx, "Register: func()", "routeComponent", routeComponent, "type", fmt.Sprintf("%T", routeComponent))
+					slog.DebugContext(ctx, "Register: func()", "routeComponent", routeComponent, "type", fmt.Sprintf("%T", routeComponent))
 				}
 
 				wrapper := LayoutWrapper{
@@ -79,7 +79,7 @@ func Register(ctx context.Context, routes ...Route) error {
 				}
 
 				if debugRegister {
-					slog.InfoContext(ctx, "Register: func()", "wrapper", fmt.Sprintf("%p", &wrapper), "LayoutComponent", fmt.Sprintf("%T", wrapper.LayoutComponent), "LayoutComponentPointer", fmt.Sprintf("%p", wrapper.LayoutComponent))
+					slog.DebugContext(ctx, "Register: func()", "wrapper", fmt.Sprintf("%p", &wrapper), "LayoutComponent", fmt.Sprintf("%T", wrapper.LayoutComponent), "LayoutComponentPointer", fmt.Sprintf("%p", wrapper.LayoutComponent))
 				}
 				return &wrapper
 			},
@@ -115,7 +115,7 @@ func composeRoute(ctx context.Context, fs ...func() app.Composer) app.Composer {
 		if component != nil {
 			if hasRouterView, ok := component.(RouterViewInterface); ok {
 				if debugRegister {
-					slog.InfoContext(ctx, "composeRoute: component is a RouterViewInterface.", "component", fmt.Sprintf("%T", component))
+					slog.DebugContext(ctx, "composeRoute: component is a RouterViewInterface.", "component", fmt.Sprintf("%T", component))
 				}
 				hasRouterView.SetRouterView(output)
 			}
