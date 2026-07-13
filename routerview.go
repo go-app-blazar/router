@@ -45,5 +45,7 @@ func (v *RouterViewComponent) SetRouterView(component app.Composer) {
 }
 
 func (v *RouterViewComponent) OnUpdate(ctx app.Context) {
-	slog.DebugContext(context.TODO(), "RouterViewComponent: Update.", "component", fmt.Sprintf("%T", v.IRouterViewComponent))
+	if debugRouterView {
+		slog.DebugContext(context.TODO(), "RouterViewComponent: Update.", "component", fmt.Sprintf("%T", v.IRouterViewComponent))
+	}
 }
