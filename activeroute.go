@@ -1,6 +1,8 @@
 package router
 
 import (
+	"strings"
+
 	"github.com/maxence-charriere/go-app/v11/pkg/app"
 )
 
@@ -48,4 +50,33 @@ func GetRoute(ctx app.Context, path string) *ActiveRoute {
 		}
 	}
 	return nil
+}
+
+// GetAllRoutes returns the list of all registered routes.
+func GetAllRoutes() []ActiveRoute {
+	routes := []ActiveRoute{}
+	for _, route := range registeredRoutes {
+		routes = append(routes, ActiveRoute{
+			Path: route.Path,
+			Meta: route.Meta,
+			// TODO: Variables
+		})
+	}
+	return routes
+}
+
+// GetStaticRoutes returns the list of all static routes.
+func GetStaticRoutes() []ActiveRoute {
+	routes := []ActiveRoute{}
+	for _, route := range registeredRoutes {
+		if strings.Contains(route.Path, ":") {
+			continue
+		}
+		routes = append(routes, ActiveRoute{
+			Path: route.Path,
+			Meta: route.Meta,
+			// TODO: Variables
+		})
+	}
+	return routes
 }

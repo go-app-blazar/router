@@ -33,6 +33,7 @@ type internalRoute struct {
 
 // registeredRoute is a route that is has been registered with the router.
 type registeredRoute struct {
+	Path      string              // The path of the route.
 	Regexp    *regexp.Regexp      // The compiled regular expression for the route.
 	Component func() app.Composer // The function that will be called to create the component for the route.
 	Meta      map[string]string   // The metadata for the route.
@@ -61,6 +62,7 @@ func Register(ctx context.Context, routes ...Route) error {
 			return fmt.Errorf("could not compile route %q: %w", r.Path, err)
 		}
 		newRegisteredRoute := registeredRoute{
+			Path:   r.Path,
 			Regexp: compiledRegexp,
 			Component: func() app.Composer {
 				if debugRegister {
